@@ -1,0 +1,16 @@
+{
+    "name": "wendryl/todo-web",
+    "type": "project",
+    "autoload": {
+        "psr-4": {
+            "Wendryl\\TodoWeb\\": "src/"
+        }
+    },
+    "authors": [
+        {
+            "name": "Wendryl",
+            "email": "wendryl10000@gmail.com"
+        }
+    ],
+    "require": {}
+}
