@@ -8,11 +8,11 @@ class DbConnector {
 
     public function __construct()
     {
-        $host = Config::DB_HOST;
-        $port = Config::DB_PORT;
-        $db   = Config::DB_DATABASE;
-        $user = Config::DB_USERNAME;
-        $pass = Config::DB_PASSWORD;
+        $host = $_ENV['DB_HOST'];
+        $port = $_ENV['DB_PORT'];
+        $db   = $_ENV['DB_DATABASE'];
+        $user = $_ENV['DB_USERNAME'];
+        $pass = $_ENV['DB_PASSWORD'];
 
         try {
             $this->dbConnection = new \PDO(
