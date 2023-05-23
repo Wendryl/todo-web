@@ -12,5 +12,7 @@
             "email": "wendryl10000@gmail.com"
         }
     ],
-    "require": {}
+    "require": {
+        "vlucas/phpdotenv": "^5.5"
+    }
 }
