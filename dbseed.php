@@ -20,8 +20,11 @@ EOS;
 
 try {
     $createTable = $dbConnection->exec($statement);
-    echo "Success!\n";
+    echo "Successo!\n";
 } catch (\PDOException $e) {
-    exit($e->getMessage());
+    echo "Muito provavelmente seu banco de dados já está configurado!";
+    echo "Para mais detalhes verifique o arquivo de logs. (./logs.txt)";
+    file_put_contents('logs.txt', "Warning DB Seed Setup Command: " . $e->getMessage());
+    exit();
 }
 ?>
