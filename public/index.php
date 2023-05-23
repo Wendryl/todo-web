@@ -21,6 +21,8 @@ if($uri[1] == 'users') {
     return;
 }
 
-header("HTTP/1.1 200 Not Found");
-echo json_encode(['message' => 'A API Gestor Web está funcionando corretamente!'], JSON_UNESCAPED_UNICODE);
-exit();
+if($uri[1] == '') {
+    header("HTTP/1.1 200 Not Found");
+    echo json_encode(['message' => 'A API Gestor Web está funcionando corretamente!'], JSON_UNESCAPED_UNICODE);
+    exit();
+}
