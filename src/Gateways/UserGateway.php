@@ -33,4 +33,37 @@ class UserGateway {
             exit($e->getMessage());
         }
     }
+
+    public function get(Array $params) {
+
+        $statement = "
+        SELECT *
+        FROM users
+        ";
+
+        if (isset($params['name'])) {
+            $statement = $statement . "WHERE firstname like '%${params['name']}%'";
+        }
+
+        if (isset($params['pageSize'])) {
+            $offset = $params['pageSize'] * ($params['page'] - 1);
+            $statement = $statement . " LIMIT ${params['pageSize']}";
+        } else {
+            $params['pageSize'] = 10;
+            $statement = $statement . " LIMIT 10";
+        }
+
+        if (isset($params['page'])) {
+            $offset = $params['pageSize'] * ($params['page'] - 1);
+            $statement = $statement . " OFFSET ${offset}";
+        }
+
+        try {
+            $statement = $this->db->prepare($statement);
+            $statement->execute();
+            return json_encode($statement->fetchAll(\PDO::FETCH_ASSOC));
+        } catch (\PDOException $e) {
+            exit($e->getMessage());
+        }
+    }
 }
