@@ -5,17 +5,9 @@ use ProgWeb\TodoWeb\Gateways\UserGateway;
 
 class UserController extends BaseController {
 
-    private $db;
-    private $requestMethod;
-    private $userId;
-
     private $userGateway;
 
-    public function __construct($db, $requestMethod, $userId) {
-        $this->db = $db;
-        $this->requestMethod = $requestMethod;
-        $this->userId = $userId;
-
+    public function __construct(private $db, private $requestMethod) {
         $this->userGateway = new UserGateway($db);
     }
 

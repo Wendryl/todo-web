@@ -1,5 +1,6 @@
 <?php
 
+use ProgWeb\TodoWeb\Controllers\AuthController;
 use ProgWeb\TodoWeb\Controllers\UserController;
 
 require './bootstrap.php';
@@ -16,11 +17,22 @@ $uri = explode('/api', $uri);
 $requestMethod = $_SERVER["REQUEST_METHOD"];
 
 if($uri[1] == '/users') {
-    $userController = new UserController($dbConnection, $requestMethod, $userId);
+    $userController = new UserController($dbConnection, $requestMethod);
     $userController->processRequest();
     return;
 }
 
-header("HTTP/1.1 200 Ok");
-echo json_encode(['message' => 'A API Gestor Web está funcionando corretamente!'], JSON_UNESCAPED_UNICODE);
+if($uri[1] == '/users/login') {
+    $authController = new AuthController($dbConnection, $requestMethod);
+    $authController->processRequest();
+    return;
+}
+
+if($uri[1] == '' ) {
+    http_response_code(200);
+    echo json_encode(['message' => 'A API Gestor Web está funcionando corretamente!'], JSON_UNESCAPED_UNICODE);
+    return;
+}
+
+http_response_code(404);
 exit();
