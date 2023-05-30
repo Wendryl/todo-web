@@ -34,7 +34,7 @@ class AuthController extends BaseController {
     public function verifyUserCredentials() {
         $input = (array) json_decode(file_get_contents('php://input'), TRUE);
 
-        if (!$this->userGateway->isValidCredentials($input)) {
+        if (!$this->userGateway->isCredentialsValid($input)) {
             $response['status_code_header'] = 'HTTP/1.1 401 Unauthorized';
             $response['body'] = null;
             return $response;
@@ -46,12 +46,18 @@ class AuthController extends BaseController {
         return $response;
     }
 
-    private function generateToken($credentials) {
+    public static function isTokenValid($token): bool {
+        $decoded = JWT::decode($token, new Key(Auth::getAuthKey(), 'HS256'));
+        return $decoded->sub == 'todo-web-app' && $decoded->exp > time() && $decoded->iat < time();
+    }
+
+    public function generateToken($credentials): string {
         $key = Auth::getAuthKey();
         $payload = [
             'sub' => 'todo-web-app',
             'name' => $credentials['login'],
             'iat' => time(),
+            'exp' => time() + 60
         ];
 
         $jwt = JWT::encode($payload, $key, 'HS256');

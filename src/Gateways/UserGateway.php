@@ -10,7 +10,7 @@ class UserGateway {
         $this->db = $db;
     }
 
-    public function isValidCredentials(Array $credentials) {
+    public function isCredentialsValid(Array $credentials) {
         $statement = "
         SELECT login, password FROM users WHERE :login = login";
 

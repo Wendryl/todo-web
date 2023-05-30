@@ -17,6 +17,7 @@ class UserController extends BaseController {
                 $response = $this->createUserFromRequest();
                 break;
             case 'GET':
+                $this->verifyUserAuth();
                 $response = $this->listUsers();
                 break;
             default:
@@ -65,5 +66,19 @@ class UserController extends BaseController {
             return false;
         }
         return true;
+    }
+
+    private function verifyUserAuth()  {
+        if (!isset($_COOKIE['auth_token'])) {
+            http_response_code(401);
+            die();
+        }
+
+        $auth_cookie = $_COOKIE['auth_token'];
+
+        if(is_null($auth_cookie) || !AuthController::isTokenValid($auth_cookie)) {
+            http_response_code(401);
+            die();
+        }
     }
 }
