@@ -4,7 +4,7 @@ namespace ProgWeb\TodoWeb\Controllers;
 use ProgWeb\TodoWeb\Gateways\UserGateway;
 
 abstract class BaseController {
-    public function __construct($db, $requestMethod) {
+    public function __construct(private $db, private $requestMethod, private $userGateway) {
         $this->db = $db;
         $this->requestMethod = $requestMethod;
 

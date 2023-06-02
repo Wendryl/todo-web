@@ -22,9 +22,10 @@ if($uri[1] == '/users') {
     return;
 }
 
-if($uri[1] == '/users/login') {
+if(strpos($uri[1], 'auth') != false) {
+    $routes = explode('/', $uri[1]);
     $authController = new AuthController($dbConnection, $requestMethod);
-    $authController->processRequest();
+    $authController->processRequest($routes[2]);
     return;
 }
 
