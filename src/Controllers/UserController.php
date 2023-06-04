@@ -67,18 +67,4 @@ class UserController extends BaseController {
         }
         return true;
     }
-
-    private function verifyUserAuth()  {
-        if (!isset($_COOKIE['auth_token'])) {
-            http_response_code(401);
-            die();
-        }
-
-        $auth_cookie = $_COOKIE['auth_token'];
-
-        if(is_null($auth_cookie) || !AuthController::isTokenValid($auth_cookie)) {
-            http_response_code(401);
-            die();
-        }
-    }
 }
