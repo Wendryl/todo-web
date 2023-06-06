@@ -1,0 +1,625 @@
+<!DOCTYPE html>
+<html lang="en">
+
+    <head>
+        <title>Gestão Web</title>
+        <meta charset="utf-8">
+        <meta name="viewport" content="width=device-width, initial-scale=1">
+        <link
+            href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0-alpha3/dist/css/bootstrap.min.css"
+            rel="stylesheet">
+        <link
+            href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.7.2/font/bootstrap-icons.css"
+            rel="stylesheet">
+        <link rel="stylesheet"
+            href="https://cdnjs.cloudflare.com/ajax/libs/bootstrap-datepicker/1.9.0/css/bootstrap-datepicker.min.css">
+        <style>
+        .background-page {
+            background-color: #0c0c0c;
+            height: 100hv;
+            overflow: hidden;
+            flex-grow: 1; 
+            overflow-y: auto; 
+            padding: 10px;
+        }
+
+        @keyframes offsetAnimation {
+            0% {
+                transform: translateY(100%);
+                opacity: 0;
+            }
+
+            70% {
+                transform: translateY(-4%);
+                opacity: 1;
+            }
+
+            100% {
+                transform: translateY(0);
+                opacity: 1;
+            }
+        }
+
+        .offset-text {
+            animation: offsetAnimation 1s ease-out forwards;
+            opacity: 0;
+        }
+
+        @keyframes fadeAnimation {
+            0% {
+                opacity: 0;
+            }
+
+            100% {
+                opacity: 1;
+            }
+        }
+
+        .fade-text {
+            animation: fadeAnimation 1s ease-out forwards;
+            opacity: 0;
+        }
+
+        .button-radius {
+            border-radius: 50px;
+        }
+
+        .shadows {
+            box-shadow: 0px 4px 8px rgba(0, 0, 0, 0.2);
+        }
+
+        .center-content {
+            display: flex;
+            align-items: center;
+            justify-content: center;
+        }
+
+        .tab-content {
+            padding-top: 50px;
+        }
+
+        .btn-xl {
+            padding: 1.5rem 1.9rem;
+            font-size: 1.25rem;
+            line-height: 1.5;
+            border-radius: 1.5rem;
+        }
+
+        .custom-h-size {
+            font-size: 40px;
+            color: #c0c0c0;
+            text-shadow: 0px 4px 0px rgba(0, 0, 0, 0.2);
+        }
+
+        .custom-p-size {
+            font-size: 30px;
+            color: white;
+        }
+
+        .card-background {
+            background-color: #121212;
+            padding: 20px;
+            border-radius: 15px;
+        }
+
+        .task-background {
+            background-color: #121212;
+            border-radius: 15px;
+        }
+
+        #taskCardsContainer {
+            max-height: 430px;
+            overflow-y: auto;
+        }
+
+        .background-button {
+            background-color: #121212;
+            box-shadow: 0 2px 6px rgba(0, 0, 0, 0.3);
+        }
+
+        .button-padding {
+            padding: 10px;
+            padding-left: 15px;
+            padding-right: 15px;
+            margin-right: 15px;
+        }
+
+        .form-check-input[type="checkbox"] {
+            width: 24px;
+            height: 24px;
+        }
+
+        .form-check-input[type="checkbox"]:checked {
+            background-color: green;
+            border-color: green;
+        }
+
+        body {
+            margin: 0;
+        }
+
+        .container {
+            padding: 0;
+            margin: 0 auto;
+            max-width: 100%;
+            box-sizing: border-box;
+        }
+
+        .content {
+            width: 100%;
+            box-sizing: border-box;
+        }
+
+        .dropdown-color {
+            background-color: #121212;
+        }
+
+        #navigationBar {
+            display: flex;
+            flex-direction: column;
+            background-color: #121212;
+            box-shadow: 0 2px 6px rgba(0, 0, 0, 0.3);
+            padding-right: 10px;
+            padding-left: 10px;
+            position: fixed;
+            width: 100%;
+            z-index: 999;
+        }
+
+        #container {
+            height: 100vh; 
+            display: flex;
+            flex-direction: column;
+        }
+
+        #taskCardsContainer {
+            flex-grow: 1;
+            overflow-y: auto;
+            margin-top: 10px;
+        }
+
+        #finishedTasksContainer {
+            flex-grow: 1;
+            overflow-y: auto;
+            margin-top: 10px;
+        }
+
+
+    </style>
+    </head>
+
+    <body>
+        <!-- Dropdown menu de notificações -->
+        <div class="dropdown">
+            <div id="notificationPopup"
+                class="dropdown-menu dropdown-menu-end dropup dropdown-color"
+                style="right: 0; left: auto; margin-top: 80px; margin-right: 30px;">
+                <h6 class="dropdown-header"
+                    style="font-weight: bold; color:white">Atividades em atraso</h6>
+                <div id="notificationContainer" class="dropdown-item"></div>
+            </div>
+        </div>
+
+        <!-- Modal para adicionar as atividades -->
+        <div class="modal fade" id="taskModal" tabindex="-1" role="dialog"
+            aria-labelledby="taskModalLabel"
+            aria-hidden="true">
+            <div class="modal-dialog" role="document">
+                <div class="modal-content card-background">
+                    <div class="modal-header">
+                        <h5 class="modal-title" id="taskModalLabel"
+                            style="color: white;">Configurar atividade</h5>
+                        <button type="button" class="btn-close"
+                            data-bs-dismiss="modal" aria-label="Close"></button>
+                    </div>
+                    <div class="modal-body">
+                        <form id="taskForm">
+                            <div class="mb-3">
+                                <label for="taskName" class="form-label"
+                                    style="color: white;">Nome da atividade</label>
+                                <input type="text" class="form-control"
+                                    id="taskName" required>
+                            </div>
+                            <div class="mb-3">
+                                <label for="taskDescription" class="form-label"
+                                    style="color: white;">Descrição</label>
+                                <textarea class="form-control"
+                                    id="taskDescription" rows="3"></textarea>
+                            </div>
+                            <div class="mb-3">
+                                <label for="taskDate" class="form-label"
+                                    style="color: white;">Data para conclusão</label>
+                                <input type="text" class="form-control"
+                                    id="taskDate">
+                            </div>
+                        </form>
+                    </div>
+                    <div class="modal-footer">
+                        <button type="button" class="btn btn-secondary"
+                            data-bs-dismiss="modal">Fechar</button>
+                        <button type="button" class="btn btn-primary"
+                            id="saveTaskButton">Salvar</button>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Estruturação tela principal -->
+        <div id="container">
+            <div id="navigationBar">
+                <div class="row align-items-center">
+                    <div class="col">
+                        <!-- Barra de navegação -->
+                        <ul
+                            class="nav nav-pills mt-2 mb-2"
+                            id="pills-tab" role="tablist">
+                            <li class="nav-item">
+                                <a class="nav-link active" style="color: white"
+                                    id="pills-home-tab" data-bs-toggle="pill"
+                                    href="#pills-home" role="tab"
+                                    aria-controls="pills-home"
+                                    aria-selected="true"><i
+                                        class="bi bi-card-checklist"></i> Suas
+                                    atividades</a>
+                            </li>
+                            <li class="nav-item">
+                                <a class="nav-link nav-link.unselected"
+                                    style="color: white" id="pills-credits-tab"
+                                    data-bs-toggle="pill" href="#pills-credits"
+                                    role="tab" aria-controls="pills-credits"
+                                    aria-selected="false"><i
+                                        class="bi bi-person-lines-fill"></i>
+                                    Créditos</a>
+                            </li>
+                        </ul>
+                    </div>
+                    <div class="col-auto justify-content-end">
+                        <!-- Ícone de notificações -->
+                        <i id="notificationIcon" class="bi bi-bell-fill"
+                            style="color: white"></i>
+                        <!-- Contador de notificações -->
+                        <span id="notificationCount" style="color: white"></span>
+                    </div>
+                    <div class="col-auto justify-content-end">
+
+                        <!-- Botão de Logout-->
+                        <button class="btn btn-secondary mr-3" id="logoutButton">
+                            <i class="bi bi-box-arrow-left"></i> Sair
+                        </button>
+                    </div>
+                </div>
+            </div>
+            <div class="container-fluid background-page full-height">
+                <div class="tab-content" id="pills-tabContent">
+                    <div class="tab-pane fade show active" id="pills-home"
+                        role="tabpanel" aria-labelledby="pills-home-tab">
+                        <!-- Tela(tab) de atividades -->
+                        <div class="container">
+                            <div class="row">
+                                <div class="col-lg-6">
+                                    <label id="taskCardsLabel"
+                                        class="empty-label mt-3"
+                                        style="color:white">
+                                        <i class="bi bi-list-task"></i>
+                                        Atividades a fazer.
+                                    </label>
+                                    <div id="taskCardsContainer"
+                                        class="container">
+                                        <!-- Cards de atividade entrarão aqui -->
+                                    </div>
+                                </div>
+                                <div class="col-lg-6">
+                                    <label id="finishedTasksLabel"
+                                        class="empty-label mt-3"
+                                        style="color:white">
+                                        <i class="bi bi-check-lg"
+                                            style="color: green"></i> Atividades
+                                        concluídas.
+                                    </label>
+                                    <div id="finishedTasksContainer"
+                                        class="container">
+                                        <!-- Atividades concluídas virão para cá -->
+                                    </div>
+                                </div>
+                            </div>
+                            <div class="row">
+                                <div class="col text-center">
+                                    <button
+                                        class="btn btn-primary mt-3 mb-3 btn-xl shadows"
+                                        id="addButton">
+                                        <i class="bi bi-plus"></i> Nova
+                                        atividade
+                                    </button>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="tab-pane fade" id="pills-credits"
+                        role="tabpanel"
+                        aria-labelledby="pills-credits-tab">
+                        <!-- Tela(tab) de créditos -->
+                        <div class="card shadows fade-text card-background mt-5">
+                            <h3 class="custom-h-size pb-5 fade-text"><i
+                                    class="bi bi-people-fill"></i> INTEGRANTES</h3>
+                            <p class="custom-p-size fade-text"><i
+                                    class="bi bi-dot"></i>
+                                Felipe Barbosa</p>
+                            <p class="custom-p-size fade-text"><i
+                                    class="bi bi-dot"></i>
+                                Francisco Nogueira</p>
+                            <p class="custom-p-size fade-text"><i
+                                    class="bi bi-dot"></i>
+                                Matheus Gouvea</p>
+                            <p class="custom-p-size fade-text"><i
+                                    class="bi bi-dot"></i>
+                                Tiago Figueira</p>
+                            <p class="custom-p-size fade-text"><i
+                                    class="bi bi-dot"></i>
+                                Wilker Faria</p>
+                            <p class="custom-p-size fade-text"><i
+                                    class="bi bi-dot"></i>
+                                Wendryl Santos</p>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
+        <script
+            src="https://cdnjs.cloudflare.com/ajax/libs/moment.js/2.29.1/moment.min.js"></script>
+        <script
+            src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0-alpha3/dist/js/bootstrap.bundle.min.js"></script>
+        <script
+            src="https://cdnjs.cloudflare.com/ajax/libs/bootstrap-datepicker/1.9.0/js/bootstrap-datepicker.min.js"></script>
+        <script
+            src="https://cdnjs.cloudflare.com/ajax/libs/bootstrap-datepicker/1.9.0/locales/bootstrap-datepicker.pt.min.js"></script>
+        <script>
+        $(document).ready(function () {
+
+            var taskIdCounter = 0;
+            var isEditingTask = false;
+            var editingTaskId = "";
+
+            // Remover card de atividade
+            $(document).on("click", ".delete-button", function () {
+                var notificationCount = parseInt($("#notificationCount").text()) || 0;
+                var card = $(this).closest(".card");
+
+                var taskDate = card.find('.card-text').eq(2).text().split('Data para conclusão: ')[1];
+                //Se atividade passou do prazo, remove também a notificação
+                if (isTaskExpired(taskDate)) {
+                    $("#notificationCount").text(notificationCount - 1);
+                    var taskId = card.attr('id').replace('taskCard-', '');
+                    var notificationId = 'notification-' + taskId;
+                    $('#' + notificationId).remove();
+                }
+
+                card.remove();
+            });
+
+            // Data de conclusão
+            $('#taskDate').datepicker({
+                format: 'dd-mm-yyyy',
+                autoclose: true,
+                language: 'pt'
+            });
+
+            //Editar card de atividade
+            $(document).on('click', '.edit-task-button', function () {
+                // Pegar os elementos do card
+                var card = $(this).closest(".card");
+                // Pegar id
+                var taskId = card.attr('id').replace('taskCard-', '');
+               
+                // Pegar nome, descrição e data
+                var taskName = card.find('.card-title').text();
+                var taskDescription = card.find('.card-text').eq(0).text();
+                var taskDate = card.find('.card-text').eq(2).text().split('Data para conclusão: ')[1];
+
+                // Colocar os valores nos campos
+                $('#taskName').val(taskName);
+                $('#taskDescription').val(taskDescription);
+                $('#taskDate').val(taskDate);
+
+                $('#taskModal').data('task-id', taskId);
+
+                isEditingTask = true;
+                editingTaskId = taskId;
+
+                // Mostrar modal
+                $('#taskModal').modal('show');
+            });
+
+            // Função para abrir o dropdown menu de notificações
+            $(document).on('click', '#notificationIcon, .dropdown-menu', function (e) {
+                e.stopPropagation();
+
+                // Alterar visivibilidadde
+                toggleNotificationsPopup();
+            });
+
+            // Fechar dropdown ao clicar fora dele
+            $(document).on('click', function (e) {
+                if ($('#notificationPopup').is(':visible')) {
+                    toggleNotificationsPopup();
+                }
+            });
+
+            //Verifica se a atividade venceu
+            function isTaskExpired(taskDate) {
+                var currentDate = new Date();
+                var parsedTaskDate = moment(taskDate, "DD-MM-YYYY");
+                return parsedTaskDate.isBefore(currentDate, "day");
+            }
+
+            //Coloca a notificação no container
+            function displayExpiredTaskNotification(taskName, taskId) {
+                var notificationId = 'notification-' + taskId;
+                var notificationItem = `<a id="${notificationId}" class="dropdown-item" style="color: white">A atividade: ${taskName} está em atraso.</a>`;
+                $("#notificationContainer").append(notificationItem);
+
+                var notificationCount = parseInt($("#notificationCount").text()) || 0;
+                $("#notificationCount").text(notificationCount + 1);
+            }
+
+            //Marcar atividade como concluída
+            $(document).on('change', 'input[type="checkbox"]', function () {
+                var taskCompletedId = $(this).attr('id').replace('completedCheck-', '');
+                var taskCard = $('#taskCard-' + taskCompletedId);
+                var finishedTasksContainer = $('#finishedTasksContainer');
+                var notificationCount = parseInt($("#notificationCount").text()) || 0;
+
+                if ($(this).prop('checked')) {
+                    //Move o card para o container de concluídos
+                    taskCard.fadeOut(function () {
+                        var buttons = taskCard.next('.d-flex');
+                        taskCard.appendTo(finishedTasksContainer).fadeIn();
+                        buttons.appendTo(finishedTasksContainer).fadeIn();
+                    });
+
+                    //Altera a data para um label de concluído
+                    var taskDateLabel = taskCard.find('.card-text').eq(2);
+                    taskDateLabel.text('Atividade concluída.'); 
+                    taskDateLabel.css('color', 'green');
+
+                    //Se a atividade está em atraso, remove a notificação
+                    var taskDate = taskCard.find('.card-text').eq(2).text().split('Data para conclusão: ')[1];
+                    if (isTaskExpired(taskDate)) {
+                        $("#notificationCount").text(notificationCount - 1);
+                        var taskId = card.attr('id').replace('taskCard-', '');
+                        var notificationId = 'notification-' + taskId;
+                        $('#' + notificationId).remove();
+                    }
+                } else {
+                    taskCard.fadeOut(function () {
+                        var buttons = taskCard.next('.d-flex');
+                        taskCard.appendTo('#taskCardsContainer').fadeIn();
+                        buttons.appendTo('#taskCardsContainer').fadeIn();
+                    });
+
+                    var taskDate = taskCard.find('.card-text').eq(2).text().split('Data para conclusão: ')[1];
+                    if (isTaskExpired(taskDate)) {
+                        $("#notificationCount").text(notificationCount + 1);
+                    }
+                }
+            });
+
+            //Salvar ou atualizar card
+            $(document).on('click', '#saveTaskButton', function () {
+                var taskName = $('#taskName').val();
+                var taskDescription = $('#taskDescription').val();
+                var taskDate = $('#taskDate').val();
+
+                var taskCard = $(`#taskCard-${taskId}`);
+
+                // Validação
+                if (taskName.trim() === "") {
+                    alert("Por favor, dê um nome a atividade.");
+                    return;
+                }
+
+                //Pegar data atual
+                var currentDate = new Date().toLocaleDateString();
+
+                // Verifica se já existe um card
+                if (isEditingTask && editingTaskId !== "") {
+                    //Atualizar card
+                    updateTaskCard(editingTaskId, taskName, taskDescription, taskDate);
+                } else {
+                    var taskId = 'taskCard-' + taskIdCounter;
+                    console.log(taskId);
+                    //Criar novo card
+                    createTaskCard(taskId, taskName, taskDescription, taskDate, currentDate);
+
+                    taskIdCounter++;
+
+                    // Limpar
+                    $("#taskForm")[0].reset();
+
+                    // Esconder
+                    $("#taskModal").modal("hide");
+                }
+
+                if (isTaskExpired(taskDate)) {
+                    displayExpiredTaskNotification(taskName, taskId);
+                    //Se atividade em atraso, exibe um label
+                    var taskDateLabel = taskCard.find('.card-text').eq(2);
+                    var expiredText = '<span style="color: red;">Atividade em atraso.</span>';
+                    taskDateLabel.append(expiredText);
+                }
+
+                // Fechar
+                $('#taskModal').modal('hide');
+                isEditingTask = false;
+                editingTaskId = "";
+            });
+
+            // Função placeholder de "logout"
+            $("#logoutButton").click(function () {
+                window.location.href = 'tela_de_login.html';
+            });
+
+            // Botão adicionar atividade
+            $("#addButton").click(function () {
+                // Limpar
+                $("#taskForm")[0].reset();
+
+                // Abrir modal
+                $("#taskModal").modal("show");
+            });
+
+            //Função criar novo card de atividade
+            function createTaskCard(taskId, taskName, taskDescription, taskDate) {
+                var taskContainer = $('<div class="task-container"></div>');
+                var currentDate = new Date().toLocaleDateString();
+
+                var taskCard = `
+                    <div class="d-flex justify-content-between align-items-center">
+                        <div class="card mb-4 task-background" id="taskCard-${taskId}" style="width: 100%;">
+                            <div class="card-body d-flex align-items-center">
+                                <div class="flex-grow-1">
+                                    <h5 class="card-title" style="color: white">${taskName}</h5>
+                                    <p class="card-text" style="color: white">${taskDescription}</p>
+                                    <p class="card-text" style="color: #c0c0c0">Criado em: ${currentDate}</p>
+                                    <p class="card-text" style="color: #c0c0c0">Data para conclusão: ${taskDate}</p>
+                                </div>
+                                <div class="form-check d-flex align-items-center" style="margin-right: 35px;">
+                                    <input class="form-check-input" type="checkbox" id="completedCheck-${taskId}">
+                                    <label class="form-check-label" for="completedCheck-${taskId}" style="color: white"></label>
+                                </div>
+                                <div class="d-flex flex-column align-items-end ml-auto mr-3">
+                                    <button class="btn btn-lg rounded-circle edit-task-button button-padding background-button mb-3 shadow" data-bs-toggle="modal" data-bs-target="#taskModal" style="color: white">
+                                        <i class="bi bi-pencil"></i>
+                                    </button>
+                                    <button class="btn btn-lg btn-danger button-padding rounded-circle delete-button shadow" style="color: white;">
+                                        <i class="bi bi-trash-fill"></i>
+                                    </button>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                `;
+
+                // Adicionar card à página
+                $('#taskCardsContainer').append(taskCard);
+            }
+
+            //Função atualizar card existente
+            function updateTaskCard(taskId, taskName, taskDescription, taskDate) {
+                var taskCard = $(`#taskCard-${taskId}`);
+
+                taskCard.find('.card-title').text(taskName);
+                taskCard.find('.card-text').eq(0).text(taskDescription);
+                taskCard.find('.card-text').eq(2).text('Data para conclusão: ' + taskDate);
+            }
+
+            //Função ativar visibilidade do dropdawn de notificações
+            function toggleNotificationsPopup() {
+                $('#notificationPopup').toggle();
+            }
+        });
+    </script>
+    </body>
+
+</html>

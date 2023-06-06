@@ -1,0 +1,220 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <title>Gestão Web</title>
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0-alpha3/dist/css/bootstrap.min.css" rel="stylesheet"
+        integrity="sha384-KK94CHFLLe+nY2dmCWGMq91rCGa5gtU4mk92HdvYe+M/SXH301p5ILy+dN9+nJOZ" crossorigin="anonymous">
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.7.2/font/bootstrap-icons.css" rel="stylesheet">
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0-alpha3/dist/js/bootstrap.bundle.min.js"
+        integrity="sha384-ENjdO4Dr2bkBIFxQpeoTz1HIcje39Wm4jDKdf19U8gI4ddQ3GYNS7NTKfAdVQSZe"
+        crossorigin="anonymous"></script>
+    <script>
+        const loginForm = document.getElementById('login-form');
+        const registerForm = document.getElementById('register-form');
+        const loginButton = document.getElementById('login-button');
+        const registerButton = document.getElementById('register-button');
+
+        registerButton.addEventListener('click', function () {
+            loginForm.style.display = 'none';
+            registerForm.style.display = 'block';
+        });
+    </script>
+    <style>
+        .move-right {
+            margin-left: auto;
+        }
+
+        @keyframes offsetAnimation {
+            0% {
+                transform: translateX(-100%);
+                opacity: 0;
+            }
+
+            70% {
+                transform: translateX(3%);
+                opacity: 1;
+            }
+
+            100% {
+                transform: translateX(0);
+                opacity: 1;
+            }
+        }
+
+        .offset-text {
+            animation: offsetAnimation 2s ease-out forwards;
+            opacity: 0;
+        }
+
+        .full-height-card {
+            height: 100%;
+        }
+
+        .center-content {
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            height: 100vh;
+        }
+
+        .custom-horizontal-spacing {
+            padding-top: 150px;
+            padding-left: 70px;
+            padding-right: 160px;
+        }
+
+        .left-section {
+            background-color: #0c0c0c;
+            height: 100vh;
+            padding: 0;
+            margin: 0;
+            overflow: hidden;
+        }
+
+        .left-section .card-body {
+            display: flex;
+            flex-direction: column;
+            align-items: flex-start;
+            justify-content: center;
+            height: 100%;
+            text-align: left;
+        }
+
+        .left-section .card {
+            border-radius: 0 30px 30px 0;
+            overflow: hidden;
+        }
+
+        .background-card {
+            background: linear-gradient(to right, #00687a, #012496);
+            box-shadow: 0px 4px 8px rgba(0, 0, 0, 0.2);
+        }
+
+        .shadows {
+            box-shadow: 0px 4px 8px rgba(0, 0, 0, 0.2);
+        }
+
+        .right-section {
+            background-color: #0c0c0c;
+            height: 100vh;
+        }
+
+        .card.borderless {
+            border: none;
+        }
+
+        .left-section .card-body h2 {
+            font-size: 70px;
+            text-shadow: 0px 4px 0px rgba(0, 0, 0, 0.2);
+            margin-left: 30px;
+        }
+
+        .background-button {
+            background: linear-gradient(to right, #00687a, #012496);
+            ;
+        }
+
+        .left-section .card-body p {
+            text-align: left;
+            margin-left: 33px;
+            font-size: 30px;
+        }
+    </style>
+</head>
+<body>
+    <div class="container-fluid">
+        <div class="row center-content">
+            <div class="col-md-6 left-section">
+                <div class="card full-height-card background-card borderless">
+                    <div class="card-body">
+                        <h2 class="offset-text" style="font-weight: bolder; color: white;">BEM VINDO!</h2>
+                        <p class="offset-text" style="color: white;">Ao seu site de controle de atividades.</p>
+                    </div>
+                </div>
+            </div>
+            <div class="col-md-6 custom-horizontal-spacing right-section">
+                <form role="form">
+                    <div class="form-group mt-3">
+                        <label for="inputEmail" class="mb-1" style="color: rgb(255,255,255)"><i
+                                class="bi bi-envelope-fill"></i> Email</label>
+                        <input type="email" class="form-control shadows" id="inputEmail" />
+                    </div>
+                    <div class="form-group mt-4">
+                        <label for="inputPassword" class="mb-1" style="color: rgb(255,255,255)"><i
+                                class="bi bi-lock-fill"></i> Senha</label>
+                        <input type="password" class="form-control shadows" id="inputPassword" />
+                        <div class="mt-4" id="confirmPassword" style="display: none;">
+                            <label for="inputConfirmPassword" style="color: rgb(255,255,255)"><i
+                                    class="bi bi-lock-fill"></i> Confirmar Senha</label>
+                            <input type="password" class="form-control shadows" id="inputConfirmPassword" />
+                        </div>
+                        <div class="d-grid gap-2">
+                            <button type="submit" id="loginButton" class="btn shadow mt-5 background-button"
+                                style="color: rgb(255, 255, 255); font-weight: bold">ENTRAR</button>
+                            <button type="button" id="registerButton" class="btn btn-light shadow mt-3 mb-5"
+                                style="font-weight: bold">CRIAR NOVA CONTA</button>
+                        </div>
+                    </div>
+                </form>
+            </div>
+        </div>
+    </div>
+    <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
+    <script>
+        $(document).ready(function () {
+            var isRegistrationActive = false;
+
+            //Alterar login para cadastro e vice-versa
+            $("#registerButton").click(function () {
+                isRegistrationActive = !isRegistrationActive;
+
+                if (isRegistrationActive) {
+                    $("#confirmPassword").show();
+                    $("#loginButton").text("CRIAR NOVA CONTA");
+                    $("#registerButton").text("VOLTAR");
+                } else {
+                    $("#confirmPassword").hide();
+                    $("#loginButton").text("ENTRAR");
+                    $("#registerButton").text("CADASTRAR");
+                }
+            });
+
+            //Validação de forms
+            $("#loginButton").click(function () {
+                var email = $("#inputEmail").val();
+                var password = $("#inputPassword").val();
+                var confirmPassword = $("#inputConfirmPassword").val();
+
+                if (isRegistrationActive) {
+                    if (email === "" || password === "" || confirmPassword === "") {
+                        alert("Por favor, preencha todos os campos.");
+                        return;
+                    }
+                    if (password.length < 6) {
+                        alert("A senha precisa conter ao menos 6 caracteres.");
+                        return;
+                    }
+                    if (password !== confirmPassword) {
+                        alert("As senhas não conferem");
+                        return;
+                    }
+                } else {
+                    if (email === "" || password === "") {
+                        alert("Por favor, preencha todos os campos.");
+                        return;
+                    }
+                    if (password.length < 6) {
+                        alert("A senha precisa conter ao menos 6 caracteres.");
+                        return;
+                    }
+                    window.location.href = "tela_principal.html";
+                }
+            });
+        });
+    </script>
+</body>
+
+</html>
