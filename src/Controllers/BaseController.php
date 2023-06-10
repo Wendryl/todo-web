@@ -11,6 +11,18 @@ abstract class BaseController {
         $this->userGateway = new UserGateway($db);
     }
 
+    protected function internalServerErrorResponse() {
+        http_response_code(500);
+        $response['body'] = null;
+        return $response;
+    }
+
+    protected function unauthorizedResponse() {
+        http_response_code(401);
+        $response['body'] = null;
+        return $response;
+    }
+
     protected function notFoundResponse()
     {
         http_response_code(404);
@@ -23,6 +35,20 @@ abstract class BaseController {
         http_response_code(400);
         $response['body'] = null;
         return $response;
+    }
+
+    protected function verifyUserAuth()  {
+        if (!isset($_COOKIE['auth_token'])) {
+            http_response_code(401);
+            die();
+        }
+
+        $auth_cookie = $_COOKIE['auth_token'];
+
+        if(is_null($auth_cookie) || !AuthController::isTokenValid($auth_cookie)) {
+            http_response_code(401);
+            die();
+        }
     }
 }
 

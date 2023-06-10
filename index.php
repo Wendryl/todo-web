@@ -1,5 +1,6 @@
 <?php
 
+use ProgWeb\TodoWeb\Controllers\ActivityController;
 use ProgWeb\TodoWeb\Controllers\AuthController;
 use ProgWeb\TodoWeb\Controllers\UserController;
 
@@ -16,12 +17,6 @@ $uri = explode('/api', $uri);
 
 $requestMethod = $_SERVER["REQUEST_METHOD"];
 
-if($uri[1] == '/users') {
-    $userController = new UserController($dbConnection, $requestMethod);
-    $userController->processRequest();
-    return;
-}
-
 if(strpos($uri[1], 'auth') != false) {
     $routes = explode('/', $uri[1]);
     $authController = new AuthController($dbConnection, $requestMethod);
@@ -29,9 +24,16 @@ if(strpos($uri[1], 'auth') != false) {
     return;
 }
 
-if($uri[1] == '' ) {
-    http_response_code(200);
-    echo json_encode(['message' => 'A API Gestor Web está funcionando corretamente!'], JSON_UNESCAPED_UNICODE);
+if($uri[1] == '/users') {
+    $userController = new UserController($dbConnection, $requestMethod);
+    $userController->processRequest();
+    return;
+}
+
+if(strpos($uri[1], 'tasks') != false) {
+    $task_id = explode('/', $uri[1])[2];
+    $activityController = new ActivityController($dbConnection, $requestMethod);
+    $activityController->processRequest($task_id);
     return;
 }
 
