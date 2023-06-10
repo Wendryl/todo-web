@@ -19,11 +19,7 @@ class ActivityController extends BaseController {
 
     public function processRequest($id = null) {
 
-        try {
-            $this->userId = JWT::decode($_COOKIE['auth_token'], new Key(Auth::getAuthKey(), 'HS256'))->user_id;
-        } catch (Exception $e) {
-            return $this->unauthorizedResponse();
-        }
+        $this->getCurrentUser();
 
         switch ($this->requestMethod) {
             case 'GET':
@@ -105,6 +101,15 @@ class ActivityController extends BaseController {
         $response['status_code_header'] = 'HTTP/1.1 204 No Content';
         $response['body'] = null;
         return $response;
+    }
+
+    private function getCurrentUser() {
+        $this->verifyUserAuth();
+        try {
+            $this->userId = JWT::decode($_COOKIE['auth_token'], new Key(Auth::getAuthKey(), 'HS256'))->user_id;
+        } catch (Exception $e) {
+            return $this->unauthorizedResponse();
+        }
     }
 
     private function validateActivity($input)
