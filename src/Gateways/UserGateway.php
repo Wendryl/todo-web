@@ -56,34 +56,20 @@ class UserGateway {
         }
     }
 
-    public function get(Array $params) {
+    public function getUserByLogin($login) {
 
         $statement = "
         SELECT id, firstname, lastname, birthdate, login
         FROM users
+        WHERE login = :login;
         ";
-
-        if (isset($params['name'])) {
-            $statement = $statement . "WHERE firstname like '%${params['name']}%'";
-        }
-
-        if (isset($params['pageSize'])) {
-            $offset = $params['pageSize'] * ($params['page'] - 1);
-            $statement = $statement . " LIMIT ${params['pageSize']}";
-        } else {
-            $params['pageSize'] = 10;
-            $statement = $statement . " LIMIT 10";
-        }
-
-        if (isset($params['page'])) {
-            $offset = $params['pageSize'] * ($params['page'] - 1);
-            $statement = $statement . " OFFSET ${offset}";
-        }
 
         try {
             $statement = $this->db->prepare($statement);
-            $statement->execute();
-            return json_encode($statement->fetchAll(\PDO::FETCH_ASSOC));
+            $statement->execute([
+                'login' => $login,
+            ]);
+            return $statement->fetch(\PDO::FETCH_OBJ);
         } catch (\PDOException $e) {
             exit($e->getMessage());
         }

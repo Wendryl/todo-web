@@ -16,10 +16,6 @@ class UserController extends BaseController {
             case 'POST':
                 $response = $this->createUserFromRequest();
                 break;
-            case 'GET':
-                $this->verifyUserAuth();
-                $response = $this->listUsers();
-                break;
             default:
                 $response = $this->notFoundResponse();
             break;
@@ -40,14 +36,6 @@ class UserController extends BaseController {
         $this->userGateway->insert($input);
         $response['status_code_header'] = 'HTTP/1.1 201 Created';
         $response['body'] = null;
-        return $response;
-    }
-
-    private function listUsers() {
-        $params = $_GET;
-        $data = $this->userGateway->get($params);
-        $response['status_code_header'] = 'HTTP/1.1 200 Ok';
-        $response['body'] = $data;
         return $response;
     }
 
