@@ -75,7 +75,21 @@ class ActivityGateway {
             'description'  => $input['description'],
             'due_date' => $input['due_date'],
         ));
-        return $statement->columnCount();
+        return $statement->rowCount();
+    }
+
+    public function delete($id)
+    {
+        $statement = "
+        DELETE FROM activities
+        WHERE id = :id
+        ";
+
+        $statement = $this->db->prepare($statement);
+        $statement->execute(array(
+            'id' => $id,
+        ));
+        return $statement->rowCount();
     }
 
     private function mapActivities($activity) {

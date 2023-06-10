@@ -38,6 +38,10 @@ class ActivityController extends BaseController {
                 $this->verifyUserAuth();
                 $response = $this->updateActivity($id);
                 break;
+            case 'DELETE':
+                $this->verifyUserAuth();
+                $response = $this->deleteActivity($id);
+                break;
             default:
                 $response = $this->notFoundResponse();
             break;
@@ -84,7 +88,19 @@ class ActivityController extends BaseController {
             return $this->notFoundResponse();
         }
 
-        $result = $this->activityGateway->update($id, $input);
+        $this->activityGateway->update($id, $input);
+
+        $response['status_code_header'] = 'HTTP/1.1 204 No Content';
+        $response['body'] = null;
+        return $response;
+    }
+
+    private function deleteActivity($id) {
+        if (!$this->activityExists($id)) {
+            return $this->notFoundResponse();
+        }
+
+        $this->activityGateway->delete($id);
 
         $response['status_code_header'] = 'HTTP/1.1 204 No Content';
         $response['body'] = null;
