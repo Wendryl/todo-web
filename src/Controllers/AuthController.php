@@ -44,6 +44,9 @@ class AuthController extends BaseController {
             return $response;
         }
 
+        $user = $this->userGateway->getUserByLogin($input['login']);
+        $input['user_id'] = $user->id;
+
         $response['status_code_header'] = 'HTTP/1.1 200 Ok';
         $response['body'] = null;
         setcookie('auth_token', $this->generateToken($input), httponly:true, path:"/");
@@ -55,6 +58,7 @@ class AuthController extends BaseController {
         $hours = 3600;
         $payload = [
             'sub' => 'todo-web-app',
+            'user_id' => $credentials['user_id'],
             'name' => $credentials['login'],
             'iat' => time(),
             'exp' => time() + 1 * $hours

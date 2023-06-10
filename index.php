@@ -1,5 +1,6 @@
 <?php
 
+use ProgWeb\TodoWeb\Controllers\ActivityController;
 use ProgWeb\TodoWeb\Controllers\AuthController;
 use ProgWeb\TodoWeb\Controllers\UserController;
 
@@ -16,16 +17,22 @@ $uri = explode('/api', $uri);
 
 $requestMethod = $_SERVER["REQUEST_METHOD"];
 
+if(strpos($uri[1], 'auth') != false) {
+    $routes = explode('/', $uri[1]);
+    $authController = new AuthController($dbConnection, $requestMethod);
+    $authController->processRequest($routes[2]);
+    return;
+}
+
 if($uri[1] == '/users') {
     $userController = new UserController($dbConnection, $requestMethod);
     $userController->processRequest();
     return;
 }
 
-if(strpos($uri[1], 'auth') != false) {
-    $routes = explode('/', $uri[1]);
-    $authController = new AuthController($dbConnection, $requestMethod);
-    $authController->processRequest($routes[2]);
+if($uri[1] == '/tasks') {
+    $activityController = new ActivityController($dbConnection, $requestMethod);
+    $activityController->processRequest();
     return;
 }
 
