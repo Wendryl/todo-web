@@ -30,9 +30,15 @@ class ActivityGateway {
             $statement->execute([
                 'user_id' => $user_id // id do mateus
             ]);
-            return json_encode($statement->fetchAll(\PDO::FETCH_ASSOC));
+            $parsed_data = array_map(array($this, 'mapActivities'), $statement->fetchAll(\PDO::FETCH_ASSOC));
+            return json_encode($parsed_data);
         } catch (\PDOException $e) {
             exit($e->getMessage());
         }
+    }
+
+    private function mapActivities($activity) {
+        $activity['is_complete'] = $activity['is_complete'] ? true : false;
+        return $activity;
     }
 }
