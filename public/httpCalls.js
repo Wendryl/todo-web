@@ -1,6 +1,9 @@
-export async function loadActivities() {
-  const result = await fetch("http://localhost:8080/api/todoItems")
-    .then((response) => response.json())
+export async function loadTasks() {
+  const result = await fetch("http://localhost:8080/api/tasks")
+    .then((response) => {
+      if (response.status == 401) throw new Error('Unauthorized');
+      return response.json();
+    })
     .then((data) => data)
     .catch((error) => {
       throw error;
@@ -9,10 +12,10 @@ export async function loadActivities() {
   return result;
 }
 
-export async function createActivity(newActivity) {
+export async function createTask(newTask) {
   const result = await fetch("http://localhost:8080/api/todoItems", {
     method: "POST",
-    body: JSON.stringify(newActivity),
+    body: JSON.stringify(newTask),
     headers: {
       "Content-Type": "application/json",
     },
@@ -26,10 +29,10 @@ export async function createActivity(newActivity) {
   return result;
 }
 
-export async function updateActivity(id, newActivity) {
+export async function updateTask(id, newTask) {
   return fetch(`http://localhost:8080/api/todoItems/${id}`, {
     method: "PUT",
-    body: JSON.stringify(newActivity),
+    body: JSON.stringify(newTask),
     headers: {
       "Content-Type": "application/json",
     },
@@ -40,7 +43,7 @@ export async function updateActivity(id, newActivity) {
     });
 }
 
-export async function deleteActivity(id) {
+export async function deleteTask(id) {
   return fetch(`http://localhost:8080/api/todoItems/${id}`, {
     method: "DELETE",
   })
