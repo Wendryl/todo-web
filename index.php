@@ -36,11 +36,5 @@ if($uri[1] == '/tasks') {
     return;
 }
 
-if($uri[1] == '' ) {
-    http_response_code(200);
-    echo json_encode(['message' => 'A API Gestor Web está funcionando corretamente!'], JSON_UNESCAPED_UNICODE);
-    return;
-}
-
 http_response_code(404);
 exit();
