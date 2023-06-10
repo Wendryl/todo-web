@@ -163,7 +163,9 @@
         </div>
     </div>
     <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
-    <script>
+    <script type="module">
+      import { authenticate } from './public/httpCalls.js';
+
         $(document).ready(function () {
             var isRegistrationActive = false;
 
@@ -183,7 +185,8 @@
             });
 
             //Validação de forms
-            $("#loginButton").click(function () {
+            $("#loginButton").click(async function (event) {
+                event.preventDefault();
                 var email = $("#inputEmail").val();
                 var password = $("#inputPassword").val();
                 var confirmPassword = $("#inputConfirmPassword").val();
@@ -209,6 +212,12 @@
                     if (password.length < 6) {
                         alert("A senha precisa conter ao menos 6 caracteres.");
                         return;
+                    }
+
+                    const response = await authenticate(email, password);
+
+                    if (response.status == 401) {
+                        return alert('E-mail ou senha incorretos!');
                     }
                     window.location.href = "tela_principal.html";
                 }
