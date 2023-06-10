@@ -11,6 +11,18 @@ abstract class BaseController {
         $this->userGateway = new UserGateway($db);
     }
 
+    protected function internalServerErrorResponse() {
+        http_response_code(500);
+        $response['body'] = null;
+        return $response;
+    }
+
+    protected function unauthorizedResponse() {
+        http_response_code(401);
+        $response['body'] = null;
+        return $response;
+    }
+
     protected function notFoundResponse()
     {
         http_response_code(404);

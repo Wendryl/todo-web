@@ -1,42 +1,46 @@
 <?php
 namespace ProgWeb\TodoWeb\Gateways;
 
-use Firebase\JWT\JWT;
-use Firebase\JWT\Key;
-use ProgWeb\TodoWeb\System\Auth;
-
 class ActivityGateway {
 
     private $db = null;
-    private $user_id;
-    private $authController;
 
     public function __construct($db)
     {
         $this->db = $db;
-        $this->user_id = $user_id = JWT::decode($_COOKIE['auth_token'], new Key(Auth::getAuthKey(), 'HS256'))->user_id;
     }
 
-    public function get() {
+    public function get($activityId) {
+
+        $statement = "
+        SELECT *
+        FROM activities WHERE id = :activity_id
+        ";
+
+        $statement = $this->db->prepare($statement);
+        $statement->execute([
+            'activity_id' => $activityId,
+        ]);
+        $parsed_data = array_map(array($this, 'mapActivities'), $statement->fetchAll(\PDO::FETCH_ASSOC));
+        return $parsed_data;
+    }
+
+    public function list($userId) {
 
         $statement = "
         SELECT *
         FROM activities WHERE user_id = :user_id
         ";
 
-        try {
-            $statement = $this->db->prepare($statement);
-            $statement->execute([
-                'user_id' => $this->user_id
-            ]);
-            $parsed_data = array_map(array($this, 'mapActivities'), $statement->fetchAll(\PDO::FETCH_ASSOC));
-            return json_encode($parsed_data);
-        } catch (\PDOException $e) {
-            exit($e->getMessage());
-        }
+        $statement = $this->db->prepare($statement);
+        $statement->execute([
+            'user_id' => $userId,
+        ]);
+        $parsed_data = array_map(array($this, 'mapActivities'), $statement->fetchAll(\PDO::FETCH_ASSOC));
+        return json_encode($parsed_data);
     }
 
-    public function insert(Array $input)
+    public function insert($userId, Array $input)
     {
         $statement = "
         INSERT INTO activities
@@ -45,18 +49,33 @@ class ActivityGateway {
         (:user_id, :title, :description, :due_date);
         ";
 
-        try {
-            $statement = $this->db->prepare($statement);
-            $statement->execute(array(
-                'user_id' => $this->user_id,
-                'title' => $input['title'],
-                'description'  => $input['description'],
-                'due_date' => $input['due_date'],
-            ));
-            return $statement->rowCount();
-        } catch (\PDOException $e) {
-            exit($e->getMessage());
-        }
+        $statement = $this->db->prepare($statement);
+        $statement->execute(array(
+            'user_id' => $userId,
+            'title' => $input['title'],
+            'description'  => $input['description'],
+            'due_date' => $input['due_date'],
+        ));
+        return $statement->rowCount();
+    }
+
+    public function update($id, Array $input)
+    {
+        $statement = "
+        UPDATE activities
+        SET
+        title = :title, description = :description, due_date = :due_date
+        WHERE id = :id
+        ";
+
+        $statement = $this->db->prepare($statement);
+        $statement->execute(array(
+            'id' => $id,
+            'title' => $input['title'],
+            'description'  => $input['description'],
+            'due_date' => $input['due_date'],
+        ));
+        return $statement->columnCount();
     }
 
     private function mapActivities($activity) {

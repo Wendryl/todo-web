@@ -30,9 +30,10 @@ if($uri[1] == '/users') {
     return;
 }
 
-if($uri[1] == '/tasks') {
+if(strpos($uri[1], 'tasks') != false) {
+    $task_id = explode('/', $uri[1])[2];
     $activityController = new ActivityController($dbConnection, $requestMethod);
-    $activityController->processRequest();
+    $activityController->processRequest($task_id);
     return;
 }
 

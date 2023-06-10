@@ -14,22 +14,17 @@ class UserGateway {
         $statement = "
         SELECT login, password FROM users WHERE :login = login";
 
-        try {
-            $statement = $this->db->prepare($statement);
-            $statement->execute(array(
-                'login' => $credentials['login'])
-            );
+        $statement = $this->db->prepare($statement);
+        $statement->execute(array(
+            'login' => $credentials['login'])
+        );
 
-            if ($statement->rowCount() < 1) return false;
+        if ($statement->rowCount() < 1) return false;
 
-            $user = $statement->fetch(\PDO::FETCH_ASSOC);
-            $dbPassword = $user['password'];
+        $user = $statement->fetch(\PDO::FETCH_ASSOC);
+        $dbPassword = $user['password'];
 
-            return (password_verify($credentials['password'], $dbPassword));
-
-        } catch (\PDOException $e) {
-            exit($e->getMessage());
-        }
+        return (password_verify($credentials['password'], $dbPassword));
     }
 
     public function insert(Array $input)
@@ -41,19 +36,15 @@ class UserGateway {
         (:firstname, :lastname, :birthdate, :login, :password);
         ";
 
-        try {
-            $statement = $this->db->prepare($statement);
-            $statement->execute(array(
-                'firstname' => $input['firstname'],
-                'lastname'  => $input['lastname'],
-                'birthdate' => $input['birthdate'] ?? null,
-                'login' => $input['login'],
-                'password' => password_hash($input['password'], PASSWORD_DEFAULT),
-            ));
-            return $statement->rowCount();
-        } catch (\PDOException $e) {
-            exit($e->getMessage());
-        }
+        $statement = $this->db->prepare($statement);
+        $statement->execute(array(
+            'firstname' => $input['firstname'],
+            'lastname'  => $input['lastname'],
+            'birthdate' => $input['birthdate'] ?? null,
+            'login' => $input['login'],
+            'password' => password_hash($input['password'], PASSWORD_DEFAULT),
+        ));
+        return $statement->rowCount();
     }
 
     public function getUserByLogin($login) {
@@ -64,14 +55,10 @@ class UserGateway {
         WHERE login = :login;
         ";
 
-        try {
-            $statement = $this->db->prepare($statement);
-            $statement->execute([
-                'login' => $login,
-            ]);
-            return $statement->fetch(\PDO::FETCH_OBJ);
-        } catch (\PDOException $e) {
-            exit($e->getMessage());
-        }
+        $statement = $this->db->prepare($statement);
+        $statement->execute([
+            'login' => $login,
+        ]);
+        return $statement->fetch(\PDO::FETCH_OBJ);
     }
 }
