@@ -64,7 +64,7 @@ class ActivityGateway {
         $statement = "
         UPDATE activities
         SET
-        title = :title, description = :description, due_date = :due_date
+        title = :title, description = :description, due_date = :due_date, is_complete = :is_complete
         WHERE id = :id
         ";
 
@@ -74,6 +74,7 @@ class ActivityGateway {
             'title' => $input['title'],
             'description'  => $input['description'],
             'due_date' => $input['due_date'],
+            'is_complete' => $input['is_complete'] ?? 0,
         ));
         return $statement->rowCount();
     }

@@ -13,7 +13,7 @@ export async function loadTasks() {
 }
 
 export async function createTask(newTask) {
-  const result = await fetch("http://localhost:8080/api/todoItems", {
+  const result = await fetch("http://localhost:8080/api/tasks", {
     method: "POST",
     body: JSON.stringify(newTask),
     headers: {
@@ -30,7 +30,7 @@ export async function createTask(newTask) {
 }
 
 export async function updateTask(id, newTask) {
-  return fetch(`http://localhost:8080/api/todoItems/${id}`, {
+  return fetch(`http://localhost:8080/api/tasks/${id}`, {
     method: "PUT",
     body: JSON.stringify(newTask),
     headers: {
@@ -44,7 +44,7 @@ export async function updateTask(id, newTask) {
 }
 
 export async function deleteTask(id) {
-  return fetch(`http://localhost:8080/api/todoItems/${id}`, {
+  return fetch(`http://localhost:8080/api/tasks/${id}`, {
     method: "DELETE",
   })
     .then((data) => data)

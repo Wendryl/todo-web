@@ -1,5 +1,5 @@
 <!DOCTYPE html>
-<html lang="en">
+<html lang="pt-br">
 
     <head>
         <title>Gestão Web</title>
@@ -375,7 +375,7 @@
         <script
             src="https://cdnjs.cloudflare.com/ajax/libs/bootstrap-datepicker/1.9.0/locales/bootstrap-datepicker.pt.min.js"></script>
         <script type="module">
-        import { logout, loadTasks } from './public/httpCalls.js';
+        import { logout, loadTasks, createTask, updateTask, deleteTask } from './public/httpCalls.js';
 
         $(document).ready(async function () {
 
@@ -411,9 +411,9 @@
 
             // Data de conclusão
             $('#taskDate').datepicker({
-                format: 'dd-mm-yyyy',
+                format: 'yyyy-mm-dd',
                 autoclose: true,
-                language: 'pt'
+                language: 'pt-BR'
             });
 
             //Editar card de atividade
@@ -517,7 +517,7 @@
             });
 
             //Salvar ou atualizar card
-            $(document).on('click', '#saveTaskButton', function () {
+            $(document).on('click', '#saveTaskButton', async function () {
                 var taskName = $('#taskName').val();
                 var taskDescription = $('#taskDescription').val();
                 var taskDate = $('#taskDate').val();
@@ -536,6 +536,18 @@
                 // Verifica se já existe um card
                 if (isEditingTask && editingTaskId !== "") {
                     //Atualizar card
+                    console.log(taskDate);
+
+                    try {
+                    await updateTask(editingTaskId, {
+                        title: taskName,
+                        description: taskDescription,
+                        due_date: taskDate,
+                    });
+                    } catch(error) {
+                      return alert('Erro ao atualizar atividade!');
+                    }
+
                     updateTaskCard(editingTaskId, taskName, taskDescription, taskDate);
                 } else {
                     var taskId = 'taskCard-' + taskIdCounter;
@@ -584,8 +596,8 @@
             //Função criar novo card de atividade
             function createTaskCard(taskId, taskName, taskDescription, taskDueDate, taskCreatedDate) {
                 var taskContainer = $('<div class="task-container"></div>');
-                var createdDate = new Date(taskCreatedDate).toLocaleDateString();
-                taskDueDate = new Date(taskDueDate).toLocaleDateString();
+                var createdDate = taskCreatedDate;
+                taskDueDate = taskDueDate.substr(0, 10);
 
                 var taskCard = `
                     <div class="d-flex justify-content-between align-items-center">
