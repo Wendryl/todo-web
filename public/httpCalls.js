@@ -12,6 +12,22 @@ export async function loadTasks() {
   return result;
 }
 
+export async function createUser(newUser) {
+  const result = await fetch("http://localhost:8080/api/users", {
+    method: "POST",
+    body: JSON.stringify(newUser),
+    headers: {
+      "Content-Type": "application/json",
+    },
+  })
+    .then((data) => data)
+    .catch((error) => {
+      throw error;
+    });
+
+  return result;
+}
+
 export async function createTask(newTask) {
   const result = await fetch("http://localhost:8080/api/tasks", {
     method: "POST",
