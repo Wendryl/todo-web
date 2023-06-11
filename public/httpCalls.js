@@ -36,7 +36,6 @@ export async function createTask(newTask) {
       "Content-Type": "application/json",
     },
   })
-    .then((response) => response.json())
     .then((data) => data)
     .catch((error) => {
       throw error;

@@ -184,6 +184,14 @@
             margin-top: 10px;
         }
 
+        #notificationIcon {
+          cursor: pointer;
+        }
+
+        .dropdown-item:hover {
+          background-color: #2e2e2e;
+        }
+
 
     </style>
     </head>
@@ -386,27 +394,45 @@
                 window.location.href = "tela_de_login.html";
             }
 
-            tasks.forEach(task => createTaskCard(task.id, task.title, task.description, task.due_date, task.created_at));
+            tasks.forEach(task => {
+                createTaskCard(task.id, task.title, task.description, task.due_date, task.created_at, task.is_complete);
+
+                if (isTaskExpired(task.due_date)) {
+                    displayExpiredTaskNotification(task.title, task.id);
+
+                    var taskCard = $('#taskCard-' + task.id);
+                    var taskDateLabel = taskCard.find('.card-text').eq(2);
+                    var expiredText = '<span style="color: red;"> Atividade em atraso.</span>';
+                    taskDateLabel.append(expiredText);
+                }
+            });
 
             var taskIdCounter = 0;
             var isEditingTask = false;
             var editingTaskId = "";
 
             // Remover card de atividade
-            $(document).on("click", ".delete-button", function () {
+            $(document).on("click", ".delete-button", async function () {
                 var notificationCount = parseInt($("#notificationCount").text()) || 0;
                 var card = $(this).closest(".card");
 
                 var taskDate = card.find('.card-text').eq(2).text().split('Data para conclusão: ')[1];
+                var taskId = card.attr('id').replace('taskCard-', '');
                 //Se atividade passou do prazo, remove também a notificação
                 if (isTaskExpired(taskDate)) {
-                    $("#notificationCount").text(notificationCount - 1);
-                    var taskId = card.attr('id').replace('taskCard-', '');
+                    var newNotificationCount = notificationCount - 1;
+                    $("#notificationCount").text(newNotificationCount < 1 ? '' : newNotificationCount);
                     var notificationId = 'notification-' + taskId;
                     $('#' + notificationId).remove();
                 }
 
-                card.remove();
+                try {
+                    await deleteTask(taskId);
+                    card.remove();
+                } catch (error) {
+                    alert('erro ao excluir tarefa');
+                }
+
             });
 
             // Data de conclusão
@@ -475,13 +501,29 @@
             }
 
             //Marcar atividade como concluída
-            $(document).on('change', 'input[type="checkbox"]', function () {
+            $(document).on('change', 'input[type="checkbox"]', async function () {
                 var taskCompletedId = $(this).attr('id').replace('completedCheck-', '');
                 var taskCard = $('#taskCard-' + taskCompletedId);
                 var finishedTasksContainer = $('#finishedTasksContainer');
                 var notificationCount = parseInt($("#notificationCount").text()) || 0;
 
                 if ($(this).prop('checked')) {
+
+                    var taskName = $(`#taskCard-${taskCompletedId} > div > div.flex-grow-1 > h5`).text();
+                    var taskDescription = $(`#taskCard-${taskCompletedId} > div > div.flex-grow-1 > p:nth-child(2)`).text();
+                    var taskDate = $(`#taskCard-${taskCompletedId} > div > div.flex-grow-1 > p:nth-child(4)`).text().substr(21);
+
+                    try {
+                        await updateTask(taskCompletedId, {
+                            title: taskName,
+                            description: taskDescription,
+                            due_date: taskDate,
+                            is_complete: true,
+                        });
+                    } catch(error) {
+                        return alert('Erro ao atualizar tarefa');
+                    }
+
                     //Move o card para o container de concluídos
                     taskCard.fadeOut(function () {
                         var buttons = taskCard.next('.d-flex');
@@ -491,7 +533,7 @@
 
                     //Altera a data para um label de concluído
                     var taskDateLabel = taskCard.find('.card-text').eq(2);
-                    taskDateLabel.text('Atividade concluída.'); 
+                    taskDateLabel.text('Atividade concluída.');
                     taskDateLabel.css('color', 'green');
 
                     //Se a atividade está em atraso, remove a notificação
@@ -536,7 +578,6 @@
                 // Verifica se já existe um card
                 if (isEditingTask && editingTaskId !== "") {
                     //Atualizar card
-                    console.log(taskDate);
 
                     try {
                     await updateTask(editingTaskId, {
@@ -551,7 +592,17 @@
                     updateTaskCard(editingTaskId, taskName, taskDescription, taskDate);
                 } else {
                     var taskId = 'taskCard-' + taskIdCounter;
-                    console.log(taskId);
+
+                    try {
+                        await createTask({
+                          title: taskName,
+                          description: taskDescription,
+                          due_date: taskDate,
+                        });
+                    } catch(error) {
+                        return alert('Erro ao criar atividade!');
+                    }
+
                     //Criar novo card
                     createTaskCard(taskId, taskName, taskDescription, taskDate, currentDate);
 
@@ -568,7 +619,7 @@
                     displayExpiredTaskNotification(taskName, taskId);
                     //Se atividade em atraso, exibe um label
                     var taskDateLabel = taskCard.find('.card-text').eq(2);
-                    var expiredText = '<span style="color: red;">Atividade em atraso.</span>';
+                    var expiredText = '<span style="color: red;"> Atividade em atraso.</span>';
                     taskDateLabel.append(expiredText);
                 }
 
@@ -594,7 +645,7 @@
             });
 
             //Função criar novo card de atividade
-            function createTaskCard(taskId, taskName, taskDescription, taskDueDate, taskCreatedDate) {
+            function createTaskCard(taskId, taskName, taskDescription, taskDueDate, taskCreatedDate, taskCompleted = false) {
                 var taskContainer = $('<div class="task-container"></div>');
                 var createdDate = taskCreatedDate;
                 taskDueDate = taskDueDate.substr(0, 10);
@@ -610,7 +661,7 @@
                                     <p class="card-text" style="color: #c0c0c0">Data para conclusão: ${taskDueDate}</p>
                                 </div>
                                 <div class="form-check d-flex align-items-center" style="margin-right: 35px;">
-                                    <input class="form-check-input" type="checkbox" id="completedCheck-${taskId}">
+                                    <input class="form-check-input" type="checkbox" id="completedCheck-${taskId}" ${taskCompleted ? 'checked' : ''}>
                                     <label class="form-check-label" for="completedCheck-${taskId}" style="color: white"></label>
                                 </div>
                                 <div class="d-flex flex-column align-items-end ml-auto mr-3">
@@ -625,6 +676,11 @@
                         </div>
                     </div>
                 `;
+
+                if (taskCompleted) {
+                  $('#finishedTasksContainer').append(taskCard);
+                  return;
+                }
 
                 // Adicionar card à página
                 $('#taskCardsContainer').append(taskCard);
